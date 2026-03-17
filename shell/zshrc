@@ -1,0 +1,70 @@
+# ─── PATH ────────────────────────────────────────────────────────────────────
+export PATH="$HOME/.local/bin:/opt/homebrew/bin:$PATH"
+
+# ─── zsh-autosuggestions ─────────────────────────────────────────────────────
+source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=#888888"
+# Accept suggestion with → arrow
+bindkey '→' autosuggest-accept
+bindkey '^[[C' autosuggest-accept   # fallback for terminals that send escape codes
+
+# ─── zsh-syntax-highlighting (must be last plugin) ───────────────────────────
+source /opt/homebrew/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+# ─── fzf ─────────────────────────────────────────────────────────────────────
+source <(fzf --zsh)
+export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border --preview-window=wrap"
+# Use fd for fzf file search (respects .gitignore)
+export FZF_DEFAULT_COMMAND="fd --type f --hidden --follow --exclude .git"
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+export FZF_ALT_C_COMMAND="fd --type d --hidden --follow --exclude .git"
+
+# ─── zoxide (smart cd) ───────────────────────────────────────────────────────
+eval "$(zoxide init zsh)"
+# `cd` still works normally; use `z` for smart jumps, `zi` for interactive
+
+# ─── Modern CLI aliases ───────────────────────────────────────────────────────
+# eza → ls
+alias ls="eza --icons --group-directories-first"
+alias ll="eza --icons --group-directories-first -l --git"
+alias la="eza --icons --group-directories-first -la --git"
+alias tree="eza --icons --tree --git-ignore"
+
+# bat → cat
+alias cat="bat --paging=never"
+alias catp="bat"   # bat with paging
+
+# fd → find
+# (just use fd directly — syntax is simpler than find)
+
+# git-delta (set as git pager)
+export GIT_PAGER="delta"
+
+# ─── Git shortcuts ────────────────────────────────────────────────────────────
+alias gs="git status -sb"
+alias gd="git diff"
+alias gds="git diff --staged"
+alias gl="git log --oneline --graph --decorate -20"
+alias gla="git log --oneline --graph --decorate --all -30"
+
+# ─── Misc quality of life ─────────────────────────────────────────────────────
+alias ..="cd .."
+alias ...="cd ../.."
+alias reload="source ~/.zshrc && echo '✓ zshrc reloaded'"
+alias path='echo $PATH | tr ":" "\n"'
+
+# ─── History ──────────────────────────────────────────────────────────────────
+HISTSIZE=50000
+SAVEHIST=50000
+HISTFILE=~/.zsh_history
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE    # commands prefixed with a space are not saved
+setopt SHARE_HISTORY        # share history across terminals
+
+# ─── Completion ───────────────────────────────────────────────────────────────
+autoload -Uz compinit && compinit
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'  # case-insensitive completion
+
+# ─── Starship prompt (must be last) ──────────────────────────────────────────
+eval "$(starship init zsh)"
