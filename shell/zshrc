@@ -46,6 +46,8 @@ alias gd="git diff"
 alias gds="git diff --staged"
 alias gl="git log --oneline --graph --decorate -20"
 alias gla="git log --oneline --graph --decorate --all -30"
+alias gcm='git add -A && git commit -m'                                     # gcm "message"
+alias gpush='git push origin $(git branch --show-current)'                  # push current branch
 
 # ─── Misc quality of life ─────────────────────────────────────────────────────
 alias ..="cd .."
