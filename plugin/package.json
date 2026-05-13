@@ -1,0 +1,6 @@
+{
+  "name": "dev-workflow",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Reusable development workflow framework for Claude Code projects"
+}
