@@ -122,7 +122,8 @@ Full development cycle for a feature or bug fix.
    GATE: developer approves plan → /clear
 5. implement-agentic        ← subagent-driven implementation with per-task review
 6. quality-review           ← architecture + Sentry + React BP + security-review-code
-7. update-docs              ← updates docs/features.md, docs/README.md, plan file
+7. update-docs              ← updates features.md, README.md, plan file + consistency
+                               pass over arch.md, db.md, api.md, mockups/
 8. generate-verification-doc← generates funcional + técnico/API verification docs
 ```
 
@@ -253,6 +254,15 @@ Runs all post-implementation quality gates:
 ### `update-docs`
 
 Updates `docs/features.md` with behavior changes. Corrects the plan file if assumptions were wrong. Verifies `docs/README.md` links are consistent.
+
+After updating those files, performs a consistency pass over all project documentation in `docs/`:
+
+- `docs/arch.md` — if the implementation introduced or changed architectural layers, patterns, or service boundaries, update the architecture description
+- `docs/db.md` — if a DB migration ran, update the schema description and any relationship diagrams
+- `docs/api.md` — if new endpoints were added or existing ones changed their shape, update the API surface reference
+- `docs/mockups/` — if the UI deviated from the mockup during implementation, flag the discrepancy to the developer rather than silently updating (the mockup is a design contract, not just documentation)
+
+The skill reads `docs/README.md` to discover which documentation files the project has declared — it does not assume a fixed set. Documents absent from the project are skipped silently.
 
 ---
 
