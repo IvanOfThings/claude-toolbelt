@@ -62,11 +62,12 @@ Generate using the canonical template — must stay under 100 lines:
 - Default locale: [locale]
 - Additional locales: [list or "none"]
 - Translation files: [locales/]
-- Standard: [.claude/rules/ui/i18n.md]
+- Standard: [.claude/rules/ui.md]
 
 ## Dev commands
 ```bash
 [build, dev, test commands from brainstorm]
+```
 ```
 
 ## Workflow
@@ -100,9 +101,9 @@ Generate using the canonical template — must stay under 100 lines:
 Populate from brainstorm answers:
 
 - `coding.md` — TypeScript/language standards, linting config, naming conventions
-- `architecture.md` — fill the `architecture-layers.md` template with project-specific layer definitions (paths, rules, forbidden patterns)
+- `architecture.md` — read `rules/templates/architecture-layers.md` from the plugin and fill in project-specific layer definitions (paths, rules, forbidden patterns)
 - `testing.md` — test strategy, mock approach, coverage expectations
-- `ui.md` — start with the `ui-design-tokens.md` template (tokens will be filled in by `init-design-system`)
+- `ui.md` — read `rules/templates/ui-design-tokens.md` from the plugin and fill in the token names (values will be completed by `init-design-system`)
 - `observability.md` — error tracker and tracing setup for this project (which library, env vars, dataset names)
 
 **5. Create docs/ files**
@@ -116,7 +117,7 @@ Populate from brainstorm answers:
   - [db.md](db.md) — database schema and entity relationships
   - [api.md](api.md) — API routes, request/response shapes, auth requirements
   ```
-- `docs/plan.md` — copy from brainstorm output (already produced by `init-brainstorm`)
+- `docs/plan.md` — already created by `init-brainstorm`; do not recreate or overwrite
 - `docs/features.md` — initial feature list from brainstorm, each with a one-line description
 - `docs/arch.md` — architecture description from brainstorm
 - `docs/db.md` — initial data model stub: "Schema defined during Sprint 1 implementation"
