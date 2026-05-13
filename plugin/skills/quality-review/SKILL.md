@@ -35,10 +35,16 @@ Use `vercel:react-best-practices` on changed `.tsx` files.
 
 Invoke `security-review-code` skill (reads `rules/security/security-checklist.md` against `git diff main`).
 
+**Gate 6: i18n compliance**
+
+Invoke `i18n-compliance` skill (reads `rules/ui/i18n.md` against modified source files in `git diff main`).
+
+Any HIGH violation blocks proceeding. MEDIUM and LOW are presented to the developer who decides.
+
 ## Output format
 
 ```
-[quality-review] PASS — all 5 gates passed
+[quality-review] PASS — all 6 gates passed
 
 or
 
