@@ -314,6 +314,38 @@ claude plugin install code-review
 
 ---
 
+## Versioning and releases
+
+Releases are managed automatically via [release-please](https://github.com/googleapis/release-please-action). Every push to `main` is analysed and, when releasable commits are found, a Release PR is opened with the updated `plugin/CHANGELOG.md` and `plugin/package.json`. Merging that PR creates the GitHub Release and the `v1.x.x` tag.
+
+### Commit convention
+
+Use **Conventional Commits** prefixed with a gitmoji for readability:
+
+| Emoji | Prefix | Version bump | When to use |
+|-------|--------|-------------|-------------|
+| ✨ | `feat:` | minor | New command, skill, or rule |
+| 🐛 | `fix:` | patch | Bug fix in existing skill or command |
+| 💥 | `feat!:` | **major** | Breaking change (renamed command, changed skill interface) |
+| 📝 | `docs:` | — | README, CHANGELOG, comments |
+| ♻️ | `refactor:` | — | Internal restructure, no behaviour change |
+| 🔧 | `chore:` | — | Config, CI, tooling |
+| 🔒 | `fix(security):` | patch | Security fix |
+
+**Examples:**
+
+```bash
+✨ feat: add init-brainstorm skill with i18n setup questions
+🐛 fix: correct unclosed code fence in init-scaffold template
+💥 feat!: rename quality-review Gate 5 to security-review-code
+📝 docs: add workflow diagrams to README
+♻️ refactor: split init-scaffold into smaller steps
+```
+
+Commits prefixed with `docs:`, `refactor:`, or `chore:` appear in the changelog but do not trigger a version bump on their own.
+
+---
+
 ## Shell configuration
 
 `shell/zshrc` — Zsh config with quality-of-life tooling. Symlink to `~/.zshrc`.
