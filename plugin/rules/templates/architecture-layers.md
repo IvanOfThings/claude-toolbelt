@@ -61,7 +61,18 @@ The same pattern applies to `api-client/`, `api-contracts/`, `components/`, and 
 
 **Cross-cutting files** (auth, shared utilities, base request helpers) stay at the layer root — they are not owned by a single domain.
 
-**Service layer exception:** services stay flat at the layer root, named `<domain>-service.ts` (e.g., `admin-stats-service.ts`, `player-stats-service.ts`). A service file *is* the domain boundary — subfoldering would be redundant and would complicate the service-first lookup rule.
+**The rule is uniform across all layers**, including services. When 2+ service files belong to the same domain, move them into a domain subfolder:
+
+```
+lib/services/
+├── admin/
+│   ├── admin-audit-service.ts
+│   └── admin-stats-service.ts
+├── player-stats-service.ts   ← single file, stays at root
+└── team-service.ts           ← single file, stays at root
+```
+
+Service files keep the full `<domain>-service.ts` name inside the subfolder — the suffix makes the file's role unambiguous even when imported across layers.
 
 ## Rationale
 
