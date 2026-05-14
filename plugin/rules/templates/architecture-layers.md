@@ -30,6 +30,39 @@
 [project-specific check commands]
 ```
 
+## Intra-layer domain organization
+
+Within each technical layer, organize files by business domain when a domain has 2+ files in that layer.
+
+**Threshold rule: create a subfolder when 2 or more files in the same layer belong to the same domain. Single files stay at the layer root.**
+
+Example — `src/hooks/`:
+
+```
+hooks/
+├── admin/             ← 3 hooks for the admin domain → subfolder
+│   ├── useAdminAudit.ts
+│   ├── useAdminMetrics.ts
+│   └── useAdminPlatformStats.ts
+├── leagues/           ← 2 hooks for leagues → subfolder
+│   ├── useLeaguePlayers.ts
+│   └── useRefreshLeagueStats.ts
+├── polls/             ← 2 hooks for polls → subfolder
+│   ├── useRespondToPoll.ts
+│   └── useSearchPolls.ts
+└── useAuth.ts         ← cross-cutting, no single domain → stays at root
+```
+
+The same pattern applies to `api-client/`, `api-contracts/`, `components/`, and any other layer that accumulates per-domain files.
+
+**Naming inside subfolders:**
+- **Keep the domain prefix** in the filename when grep-ability matters (hooks: `useAdminAudit`, `useLeaguePlayers` — a grep for `useAdmin` returns all admin hooks regardless of folder depth).
+- **Drop the domain prefix** when the folder already provides full context and the function names read clearly without it (`api-client/admin/stats.ts`, not `api-client/admin/admin-stats.ts`).
+
+**Cross-cutting files** (auth, shared utilities, base request helpers) stay at the layer root — they are not owned by a single domain.
+
+**Service layer exception:** services stay flat at the layer root, named `<domain>-service.ts` (e.g., `admin-stats-service.ts`, `player-stats-service.ts`). A service file *is* the domain boundary — subfoldering would be redundant and would complicate the service-first lookup rule.
+
 ## Rationale
 
 [Why this layering was chosen for this project. What problems it solves. Written during init-project brainstorm.]

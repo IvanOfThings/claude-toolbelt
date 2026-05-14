@@ -37,3 +37,5 @@ Workflow when adding a handler that needs data:
 4. Only create a new service file if no service owns the entity yet
 
 Business logic (state validation, error codes, transactions, cache invalidation) belongs in the service. Handlers do: auth check → input parsing → service call → error mapping → response serialisation. Handlers do not re-implement business rules.
+
+Services live flat at the service layer root, named `<domain>-service.ts`. Do not create subfolders for services — the file is already the domain boundary. Other layers (hooks, api-client, api-contracts) use domain subfolders when 2+ files share the same domain; see `architecture-layers.md`.
