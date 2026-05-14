@@ -84,32 +84,30 @@ The core loop. Run it for every feature or bug fix — whether from a plain desc
 
 ```mermaid
 flowchart TD
-    A["/dev-cycle description or spec-path"] --> B[check-dependencies]
-    B --> C[analyze-context\nRead CLAUDE.md · docs · mockups]
+    A["/dev-cycle description or spec"] --> B[check-dependencies]
+    B --> C["analyze-context\nRead CLAUDE.md · docs · mockups"]
     C --> D{Context OK?}
     D -- Revise --> C
     D -- Approved --> E{UI changes?}
-    E -- Yes --> F[update-mockups\n390px-first mockup]
+    E -- Yes --> F["update-mockups\n390px-first mockup"]
     F --> G{Mockup approved?}
     G -- Revise --> F
-    G -- Approved --> H
+    G -- Approved --> H{Complex task?}
     E -- No --> H
-    H{Complex task?}
-    H -- Yes --> I[write-plan + security-review-plan\nImplementation plan]
-    I --> J{CRITICAL security issues?}
+    H -- Yes --> I["write-plan + security-review-plan\nImplementation plan"]
+    I --> J{CRITICAL issues?}
     J -- Yes --> K[Stop — fix plan]
     J -- No --> L{Plan approved?}
     L -- Revise --> I
-    L -- Approved --> M[/clear context]
-    M --> N
-    H -- No / fast path --> N
-    N[implement-agentic\nSubagent-driven TDD implementation]
-    N --> O[quality-review\n6 gates]
+    L -- Approved --> M["Run /clear\nFree context before impl"]
+    M --> N["implement-agentic\nSubagent-driven TDD"]
+    H -- "No, fast path" --> N
+    N --> O["quality-review\n6 gates"]
     O --> P{BLOCKED?}
     P -- Yes --> Q[Fix issues]
     Q --> O
-    P -- No --> R[update-docs\nfeatures.md · deviations · consistency]
-    R --> S[generate-verification-doc\nManual + automated test docs]
+    P -- No --> R["update-docs\nfeatures.md · deviations · consistency"]
+    R --> S["generate-verification-doc\nManual + automated test docs"]
     S --> T[Cycle complete]
 ```
 
