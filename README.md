@@ -316,7 +316,7 @@ claude plugin install code-review
 
 ## Versioning and releases
 
-Releases are managed automatically via [release-please](https://github.com/googleapis/release-please-action). Every push to `main` is analysed and, when releasable commits are found, a Release PR is opened with the updated `plugin/CHANGELOG.md` and `plugin/package.json`. Merging that PR creates the GitHub Release and the `v1.x.x` tag.
+Releases are managed automatically via [release-please](https://github.com/googleapis/release-please-action). Every merge to `main` is analysed and, when releasable commits are found, a Release PR is opened with the updated `plugin/CHANGELOG.md` and `plugin/package.json`. Merging that PR creates the GitHub Release and the `v1.x.x` tag.
 
 ### Commit convention
 
