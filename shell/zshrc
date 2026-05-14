@@ -70,3 +70,4 @@ zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'  # case-insensitive completi
 
 # ─── Starship prompt (must be last) ──────────────────────────────────────────
 eval "$(starship init zsh)"
+eval "$(fnm env --use-on-cd --shell zsh)"
