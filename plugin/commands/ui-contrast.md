@@ -22,33 +22,31 @@ If no UI files changed: output `[ui-contrast] No UI files changed — nothing to
 
 ---
 
-## Step 3 — Audit contrast
+## Step 3 — Extract text/background pairs
 
-For each changed UI file, identify every text-on-background combination (Tailwind classes, CSS variables, or inline styles). Look up the hex values in `.claude/rules/ui.md`.
+For each changed UI file, identify every text-on-background combination (Tailwind classes, CSS variables, or inline styles). Resolve each one to hex by looking up the token in `.claude/rules/ui.md`.
 
-Apply WCAG AA minimums:
-- Normal text (< 18pt / < 14pt bold): **4.5:1**
-- Large text (≥ 18pt or ≥ 14pt bold): **3:1**
-- UI components and graphical objects (icons, borders): **3:1**
+For each pair, classify `kind`:
+- `large` if the text uses a class corresponding to ≥ 18pt regular or ≥ 14pt bold (e.g. `text-xl`, `text-2xl`, `text-lg font-bold`)
+- `ui` if the element is an icon, border, focus ring, or other graphical object
+- `normal` otherwise
+
+Build the `pairs` list with `{ label: "<file>:<line> — <text-token> on <bg-token>", text_hex, bg_hex, kind }`.
+
+Also build `available_tokens` from the Token Reference table in `.claude/rules/ui.md` so failures come back with suggested replacements.
+
+If no pairs were found: output `[ui-contrast] No text/background pairs detected in changed files.` and stop.
 
 ---
 
-## Step 4 — Output
+## Step 4 — Run contrast check
 
-```
-[ui-contrast] PASS — all combinations meet WCAG AA
+Invoke `check-contrast` with the `pairs` and `available_tokens` built above.
 
-or
+---
 
-[ui-contrast] ISSUES FOUND
+## Step 5 — Output
 
-  src/components/poll-card.tsx:23
-  text-soft (#6B7280) on bg-page (#FFFFFF) — ratio 4.6:1 ✅
-
-  src/components/status-badge.tsx:15
-  text-faint (#D1D5DB) on bg-panel (#F9FAFB) — ratio 1.8:1 ❌
-  Required: 4.5:1 (normal text)
-  → Use text-soft (#6B7280) or text-strong (#111827) instead
-```
+Pass the `check-contrast` output through unchanged. Prefix the final line with `[ui-contrast]` for traceability.
 
 This command does not gate — it provides information for the developer to act on.

@@ -24,33 +24,20 @@ Show the following table and ask the developer to choose one:
 
 Wait for the developer's selection before continuing.
 
-**3. Propose 3 color palettes**
+**3. Propose 3 candidate palettes (pre-validated)**
 
-Based on the product context from `docs/plan.md`, generate 3 contextualised palette proposals. Each contains:
-- `primary` — main brand color (hex value + Tailwind scale reference)
-- `surface` — page and panel backgrounds (light / dark hex values)
-- `accent` — secondary action color (hex value)
-- WCAG AA contrast ratio for primary text on the light surface background
+Based on the product context from `docs/plan.md`, generate candidate palettes. Each candidate is a **full `token_table`** matching the shape consumed by `check-contrast` Mode 2 and `check-affordance` — see `rules/templates/ui-design-tokens.md` for the complete list of categories (surfaces, text, brand, buttons, links, borders, focus). Do not skip categories: a palette without `button-primary-bg` cannot be validated for affordance.
 
-Example for a sports management app:
-```
-Palette A "Campo de juego"
-  primary:  #16A34A (green-600)  contrast on white: 4.6:1 ✅
-  surface:  #F0FDF4 (light) / #052E16 (dark)
-  accent:   #FACC15 (yellow-400)
+**Pre-validate each candidate** by invoking, in order:
 
-Palette B "Equipación"
-  primary:  #2563EB (blue-600)   contrast on white: 5.9:1 ✅
-  surface:  #EFF6FF (light) / #1E3A5F (dark)
-  accent:   #F97316 (orange-500)
+1. `check-contrast` in **Mode 2** with the candidate's `token_table`. The skill expands the canonical matrix and returns the full audit. The matrix definition lives in `check-contrast` — do not duplicate it here.
+2. `check-affordance` with the same `token_table`, **omitting `rules_md_path`** (the file does not exist yet — only token-level checks 1–7 run).
 
-Palette C "Noche"
-  primary:  #7C3AED (violet-600) contrast on white: 5.5:1 ✅
-  surface:  #F5F3FF (light) / #1E1B4B (dark)
-  accent:   #06B6D4 (cyan-500)
-```
+A candidate is presentable only if **both** skills return `PASS`. Discard failing candidates and regenerate until you have 3 valid options.
 
-Present all three with names. Ask the developer to choose one or describe custom colors.
+Show the developer the resulting palettes with their full `check-contrast` tables and `check-affordance` results, then ask them to choose or describe custom colors.
+
+If the developer describes custom colors, build the full `token_table` from their input and run both skills again before accepting. On any failure, surface it with the suggested replacement and re-ask — do not silently proceed.
 
 Wait for the developer's selection before continuing.
 
@@ -89,50 +76,29 @@ import { HomeIcon } from "@heroicons/react/24/outline"
 
 **6. Write .claude/rules/ui.md**
 
-Fill the `rules/templates/ui-design-tokens.md` template from the plugin with the resolved values for this project:
+Fill the `rules/templates/ui-design-tokens.md` template from the plugin with the resolved values from the chosen `token_table`. The template defines the canonical structure — do not invent sections or omit declared categories. The file must include:
 
-```markdown
-# UI Design Tokens — [Project Name]
+- All token categories from the template: Surfaces and text, Brand, Buttons (with hover/focus-visible/disabled columns), Links (with decoration column), Borders/separators/focus.
+- The WCAG Contrast Reference table filled with the actual `check-contrast` Mode 2 output for this token table.
+- The Affordance Audit table (will be filled in paso 7).
+- The Pattern Catalogue sections from the template: Hero, Buttons × all states, Links, Inputs, Focus ring, Status badges, Active tab states.
+- The Contrast & Affordance Audit Checklist at the end.
 
-## Component library: [chosen library]
+The declarations for hover, focus-visible, and disabled states for every interactive token are mandatory — `check-affordance` will verify them in paso 7. "Uses default" is not acceptable; declare explicit values.
 
-## Token Reference (Light / Dark)
-| Token | Light | Dark |
-|-------|-------|------|
-| bg-page     | [hex] | [hex] |
-| bg-panel    | [hex] | [hex] |
-| text-strong | [hex] | [hex] |
-| text-soft   | [hex] | [hex] |
-| text-faint  | [hex] | [hex] |
-| text-primary| [hex] | [hex] |
-| accent      | [hex] | [hex] |
+**7. Final audit (gate)**
 
-## WCAG Contrast Reference
-| Text token | Background token | Ratio | Status |
-|-----------|-----------------|-------|--------|
-| text-primary | bg-panel (light) | ?:1 | [✅/❌] |
-| text-strong  | bg-page (light)  | ?:1 | [✅/❌] |
-[additional combinations from the palette]
+Run both skills against the freshly written `.claude/rules/ui.md`:
 
-## Pattern Catalogue
-### Hero / dark sections
-[Correct and incorrect usage for hero backgrounds]
+1. `check-contrast` Mode 2 with the resolved `token_table`. Expected: `[check-contrast] PASS`.
+2. `check-affordance` with the same `token_table` **and `rules_md_path` pointing to `.claude/rules/ui.md`** — this enables declaration-level checks 8–10 (link underline, hover/focus-visible declared, disabled declared). Expected: `[check-affordance] PASS`.
 
-### Active tab / selector states
-[Correct usage for interactive elements]
+Fill the "Affordance Audit" table in `.claude/rules/ui.md` with the result.
 
-### Status badges
-[Color assignments for open, closed, pending, error states]
+If either skill returns `FAIL`: do not close the command. Show the failures with the skill's suggested replacements, ask the developer how to adjust (swap token, tweak hex, regenerate palette, add missing state declaration), apply the fix to `.claude/rules/ui.md` and `docs/design-system.html`, and re-audit. Loop until both audits pass.
 
-## Contrast Audit Checklist
-- [ ] Hero sections — all text uses light variants on dark gradient
-- [ ] Active tabs/nav — use text-primary on light backgrounds
-- [ ] Status badges — darker text variants in light mode with dark-mode overrides
-- [ ] Normal text on panels — text-strong or text-soft; never text-faint for meaningful content
-```
+**8. Output**
 
-**7. Output**
-
-Report: three files created/updated — `docs/design-system.html`, `docs/icons.html`, `.claude/rules/ui.md`.
+Report: three files created/updated — `docs/design-system.html`, `docs/icons.html`, `.claude/rules/ui.md` — and the two final `PASS` lines from `check-contrast` and `check-affordance`.
 
 Note: if future `dev-cycle` runs introduce icons not in `docs/icons.html`, run `/update-icons` to add them.
