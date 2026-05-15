@@ -33,7 +33,9 @@ Use `vercel:react-best-practices` on changed `.tsx` files.
 
 **Gate 5: Security**
 
-Invoke `security-review-code` skill (reads `rules/security/security-checklist.md` against `git diff main`).
+Invoke `security-review-code` skill. The skill applies `rules/security/security-checklist.md` (OWASP Top 10 + CSRF + XSS) against `git diff main`, runs a dependency audit (A06) against the project's lockfile, and runs a secret scan (A02). Findings are reported with OWASP IDs, e.g. `[A01-CRITICAL]`, `[A06-CRITICAL]`, `[A02-CRITICAL]`.
+
+CRITICAL findings in any OWASP category block proceeding. `--ai` mode is not invoked here automatically — use `/security-review code --ai` manually for high-risk PRs.
 
 **Gate 6: i18n compliance**
 
@@ -54,7 +56,9 @@ or
   src/services/poll.ts:45 — catch block missing captureException before console.error
 
   Gate 5 — Security
-  [CRITICAL] src/api/admin.ts:12 — route handler missing auth check
+  [A01-CRITICAL] src/api/admin.ts:12 — route handler missing auth check
+  [A06-CRITICAL] axios@0.21.0 — CVE-2024-39338 (SSRF), fixed in 1.7.4
+  [A02-CRITICAL] config/staging.env:7 — possible committed AWS access key ID
 ```
 
 CRITICAL security issues and architecture violations block proceeding. MEDIUM and LOW issues are presented to the developer who decides whether to fix before moving on.
