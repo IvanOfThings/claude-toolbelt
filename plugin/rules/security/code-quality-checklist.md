@@ -8,6 +8,7 @@ Run this checklist on every code change before merging. Used by the `quality-rev
 - [ ] No raw `fetch('/api/...')` outside the API client layer
 - [ ] API request/response shapes defined in a contracts layer and shared between client and server
 - [ ] Business logic in services, not in routes or components
+- [ ] No magic strings for domain enums — states, roles, types/kinds, error codes come from a single enum / `const as const` / generated schema type, never duplicated as string literals across files (see `rules/code-quality/code-quality.md`)
 
 ## React / Next.js (skip if not applicable)
 

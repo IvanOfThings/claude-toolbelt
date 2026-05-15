@@ -26,6 +26,41 @@ A file that grows beyond ~200 lines is a signal to extract components or helpers
 
 Follow the patterns already established in the codebase. Before introducing a new pattern, verify no equivalent pattern already exists.
 
+## No magic strings for domain enums
+
+Every finite set of values that crosses more than one file must come from a **single source**: a TypeScript `enum`, a `const` object with `as const` + a union type, or a type generated from the database schema (Prisma, Drizzle, Kysely, etc.). The string literal is declared once; every comparison, assignment, and persisted value references the source.
+
+Applies to:
+- **Status / state** values (`'active'`, `'pending'`, `'archived'`)
+- **Role / permission** values (`'admin'`, `'editor'`, `'viewer'`)
+- **Type / kind / category** discriminators
+- **Domain error codes** (`'INSUFFICIENT_FUNDS'`, `'NOT_AUTHORISED'`)
+- **HTTP-relevant constants** that the app interprets in logic (custom header names, well-known query parameters)
+
+Examples — wrong vs right:
+
+```ts
+// ❌ magic string repeated across files
+if (poll.status === 'open') { ... }                 // src/components/poll-card.tsx
+return polls.filter(p => p.status !== 'archived')   // src/services/poll.ts
+await prisma.poll.update({ data: { status: 'closed' } })  // src/services/poll.ts
+
+// ✅ single source — generated type from schema
+import { PollStatus } from '@/db/types'             // or local enum, or const + as const
+if (poll.status === PollStatus.Open) { ... }
+return polls.filter(p => p.status !== PollStatus.Archived)
+await prisma.poll.update({ data: { status: PollStatus.Closed } })
+```
+
+**Refactor trigger:** if the same literal appears 3+ times across different files in a comparison, `switch case`, or assignment, an enum is waiting to be extracted. The third occurrence is when you extract — not the tenth.
+
+**Exceptions** — magic strings are acceptable when:
+- The literal is used in **a single file**, in **a single place**, and is not a state the system reasons about (e.g. a debug log label, a one-off test fixture).
+- The value belongs to an **external API** the project does not own and is never interpreted in business logic (e.g. an upstream provider's status code passed straight through).
+- The string **is the data** introduced by a user or external system (a tag, a label, a free-form category) — not a state the application defines.
+
+When in doubt, extract. Three similar literals is the canonical signal.
+
 ## Service-first data access
 
 Every database query introduced in an HTTP handler must go through a service layer function. There is no inline-complexity threshold, no "small one-off query" exception.
