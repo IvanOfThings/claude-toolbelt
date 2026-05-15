@@ -44,6 +44,8 @@ Mark each test by placing `x` in the checkbox and filling in comments:
 - ⚠️ PARTIAL → what works and what doesn't
 - ❌ FAIL → what happens vs what should happen
 
+If a test fails or is partial, `/verify-pr` will append a **Fix iteration** block below the test. The tester re-checks the iteration and either marks it ✅ OK (test resolved) or fills in a new comment so `/verify-pr` can append a further iteration. The loop continues until the latest iteration is ✅ OK.
+
 ---
 
 ## Prerequisites
@@ -63,7 +65,7 @@ Mark each test by placing `x` in the checkbox and filling in comments:
 1. <User action>
 2. <User action>
 
-**Status:**
+**Initial status:**
 - [ ] ✅ OK
 - [ ] ⚠️ PARTIAL
 - [ ] ❌ FAIL
@@ -88,6 +90,43 @@ Mark each test by placing `x` in the checkbox and filling in comments:
 | Visual regression | Permission rejection at API level (403) |
 | Form submit + visible result | Payload validation (invalid body → 422) |
 
+## Fix iteration block
+
+When `/verify-pr` (via `apply-pr-fixes`) fixes a failing test, it appends a **Fix iteration** block **below** the test's Initial status and Comments. The Initial status and Comments are never modified — they remain as the historical record of the original failure.
+
+```markdown
+#### 🔧 Fix iteration N — YYYY-MM-DD — `<short-hash-or-pending>`
+
+**Diagnosis:** <root cause analysis from diagnose-pr-failures>
+
+**Changes:**
+- `path/to/file.ts:L1-L2` — <what changed and why>
+- `path/to/another.ts:L3` — <what changed>
+
+**Unit coverage:** `path/to/test.ts → "test name added or updated"`
+
+**What to re-check:** <concrete steps the tester runs to verify the fix; refer to the original test steps and call out the specific outcome that should change>
+
+**Tester re-check (iteration N):**
+- [ ] ✅ OK
+- [ ] ❌ STILL FAILING
+- [ ] ⚠️ NEW ISSUE FOUND
+
+**Comments (iteration N):**
+>
+```
+
+The hash field is `pending` when the iteration is written before the developer commits, and is back-filled by the developer after committing (or left as `pending` if they prefer).
+
+## Iteration rules
+
+- **Numbering**: iterations are numbered per test (`Fix iteration 1`, `Fix iteration 2`, ...). When appending, `apply-pr-fixes` reads the previous iterations and picks the next integer.
+- **History is preserved**: never edit a previous iteration block — append a new one. The full sequence of attempts must remain visible for review.
+- **Resolution rule**: a test is considered resolved when its **latest iteration** has `[x] ✅ OK`. A test with no iteration block is resolved only if the Initial status is `[x] ✅ OK`.
+- **Re-entry**: a test whose latest iteration is `[x] ❌ STILL FAILING` or `[x] ⚠️ NEW ISSUE FOUND` is picked up by the next `/verify-pr` run, which appends `Fix iteration N+1`.
+- **Tester-only fields**: the "Tester re-check" checkboxes and "Comments (iteration N)" field are filled by the tester, never by `apply-pr-fixes`. The skill writes them as empty placeholders.
+- **Diagnosis context**: when generating iteration N, `diagnose-pr-failures` reads iterations 1..N-1 so the new fix does not repeat a previously failed attempt.
+
 ## Archiving
 
-When all tests in a doc are `[x] ✅ OK`, move it to `docs/superpowers/verification/verified/`.
+When all tests in a doc are resolved per the resolution rule above, move it to `docs/superpowers/verification/verified/`.
