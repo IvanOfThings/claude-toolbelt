@@ -1,0 +1,22 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "ivanofthings-toolbelt",
+  "description": "Personal Claude Code toolbelt — dev-workflow framework with init/refine/dev-cycle/verify-pr/security-review/design-system commands.",
+  "owner": {
+    "name": "Ivan Perea",
+    "email": "ivanpereafuentes@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "dev-workflow",
+      "description": "Reusable development workflow framework for Claude Code projects. Orchestrates brainstorm → scaffold → design system → refined specs → dev cycle → verification, with built-in OWASP security review, WCAG contrast + affordance audits, and iterative PR verification.",
+      "author": {
+        "name": "Ivan Perea",
+        "email": "ivanpereafuentes@gmail.com"
+      },
+      "category": "development",
+      "source": "./plugin",
+      "homepage": "https://github.com/IvanOfThings/claude-toolbelt"
+    }
+  ]
+}
