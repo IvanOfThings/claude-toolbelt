@@ -320,29 +320,33 @@ Releases are managed automatically via [release-please](https://github.com/googl
 
 ### Commit convention
 
-Use **Conventional Commits** prefixed with a gitmoji for readability:
+Use **plain [Conventional Commits](https://www.conventionalcommits.org/)** — no emoji prefix. Release-please parses the prefix to decide the version bump and to populate the changelog. Any leading character other than the type (`feat`, `fix`, etc.) makes the commit invisible to the parser.
 
-| Emoji | Prefix | Version bump | When to use |
-|-------|--------|-------------|-------------|
-| ✨ | `feat:` | minor | New command, skill, or rule |
-| 🐛 | `fix:` | patch | Bug fix in existing skill or command |
-| 💥 | `feat!:` | **major** | Breaking change (renamed command, changed skill interface) |
-| 📝 | `docs:` | — | README, CHANGELOG, comments |
-| ♻️ | `refactor:` | — | Internal restructure, no behaviour change |
-| 🔧 | `chore:` | — | Config, CI, tooling |
-| 🔒 | `fix(security):` | patch | Security fix |
+| Prefix | Version bump | When to use |
+|--------|--------------|-------------|
+| `feat:` | minor | New command, skill, or rule |
+| `fix:` | patch | Bug fix in existing skill or command |
+| `feat!:` (or footer `BREAKING CHANGE:`) | **major** | Breaking change (renamed command, changed skill interface) |
+| `docs:` | — | README, CHANGELOG, comments |
+| `refactor:` | — | Internal restructure, no behaviour change |
+| `chore:` | — | Config, CI, tooling |
+| `fix(security):` | patch | Security fix |
+
+Optional scope after the type: `feat(skills): ...`, `fix(commands/verify-pr): ...`.
 
 **Examples:**
 
 ```bash
-✨ feat: add init-brainstorm skill with i18n setup questions
-🐛 fix: correct unclosed code fence in init-scaffold template
-💥 feat!: rename quality-review Gate 5 to security-review-code
-📝 docs: add workflow diagrams to README
-♻️ refactor: split init-scaffold into smaller steps
+feat: add init-brainstorm skill with i18n setup questions
+fix: correct unclosed code fence in init-scaffold template
+feat!: rename quality-review Gate 5 to security-review-code
+docs: add workflow diagrams to README
+refactor: split init-scaffold into smaller steps
 ```
 
 Commits prefixed with `docs:`, `refactor:`, or `chore:` appear in the changelog but do not trigger a version bump on their own.
+
+> **Why no emoji?** Release-please uses a strict Conventional Commits parser. A leading character that is not part of the type (e.g. `✨ feat: ...`) is not recognised, the commit is dropped from the changelog, and the version bump can be calculated incorrectly. If you want a visual marker, use the scope (`feat(skills): ...`) — that is still parsed correctly.
 
 ---
 
