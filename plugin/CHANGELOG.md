@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.0](https://github.com/IvanOfThings/claude-toolbelt/compare/v1.1.0...v1.2.0) (2026-05-17)
+
+
+### Features
+
+* add transaction coordinator + atomic action pattern as a rule ([48d9674](https://github.com/IvanOfThings/claude-toolbelt/commit/48d96740852f41f508d45f3d5bf44f14f452926d))
+* add transaction coordinator + atomic action pattern as a rule ([b19b8d1](https://github.com/IvanOfThings/claude-toolbelt/commit/b19b8d1371aa9146d66fc7467fe4ffd614e63c37))
+
 ## [1.1.0](https://github.com/IvanOfThings/claude-toolbelt/compare/v1.0.0...v1.1.0) (2026-05-15)
 
 
