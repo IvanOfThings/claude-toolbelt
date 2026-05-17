@@ -9,6 +9,7 @@ Run this checklist on every code change before merging. Used by the `quality-rev
 - [ ] API request/response shapes defined in a contracts layer and shared between client and server
 - [ ] Business logic in services, not in routes or components
 - [ ] No magic strings for domain enums — states, roles, types/kinds, error codes come from a single enum / `const as const` / generated schema type, never duplicated as string literals across files (see `rules/code-quality/code-quality.md`)
+- [ ] Services with multi-step transactions follow the coordinator + atomic-action pattern (see `rules/code-quality/transaction-coordinator.md`) — no super-function combining validations, transaction wrapper, and all writes in one body
 
 ## React / Next.js (skip if not applicable)
 
