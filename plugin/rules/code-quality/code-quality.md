@@ -74,3 +74,5 @@ Workflow when adding a handler that needs data:
 Business logic (state validation, error codes, transactions, cache invalidation) belongs in the service. Handlers do: auth check → input parsing → service call → error mapping → response serialisation. Handlers do not re-implement business rules.
 
 All layers — including services — use domain subfolders when 2+ files share the same domain. See `architecture-layers.md` for the full rule.
+
+**Transactional services** (any service operation that spans 2+ writes that must succeed or fail together) follow the **coordinator + atomic-action** pattern. See `rules/code-quality/transaction-coordinator.md` for the full doctrine: atomic actions accept an injectable `DbClient` and do one CRUD each; the coordinator owns validations, the transaction wrapper, and the tracing span. Never bundle everything into one super-function.
