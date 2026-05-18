@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0](https://github.com/IvanOfThings/claude-toolbelt/compare/v1.2.0...v1.3.0) (2026-05-18)
+
+
+### Features
+
+* backport UI rule learnings from real-world use in cooklydo ([1919c19](https://github.com/IvanOfThings/claude-toolbelt/commit/1919c19194de10bcadf574c59afb87fa2889ca05))
+* backport UI rule learnings from real-world use in cooklydo ([b18d69d](https://github.com/IvanOfThings/claude-toolbelt/commit/b18d69d7fe443486e7afb1afe5abbdec09fbc5dc))
+
 ## [1.2.0](https://github.com/IvanOfThings/claude-toolbelt/compare/v1.1.0...v1.2.0) (2026-05-17)
 
 
