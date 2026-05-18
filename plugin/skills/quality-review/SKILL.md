@@ -87,10 +87,50 @@ or
 
 This gate is **informational only** — it does not block `quality-review` from passing. The developer reviews each candidate and decides whether to refactor or accept (some literals are legitimately one-off).
 
+**Gate 8: Inline `process.env` scan (informational — non-blocking)**
+
+Heuristic scan for `process.env.<NAME>` accesses in application code outside the project's designated config module. Reads `rules/code-quality/env-config.md` for context.
+
+**Scan procedure** against `git diff main` plus the rest of `src/` (or equivalent app source directory):
+
+1. Locate the project's env-config module. Candidates, in order: `src/env.ts`, `src/env.js`, `src/config.ts`, `src/config.js`, `src/lib/env.ts`, `src/lib/config.ts`. The first that exists is treated as the canonical config module.
+2. Grep changed files for `process\.env\.[A-Z_][A-Z0-9_]*` matches.
+3. For each match, classify:
+   - **Allowed** if the file is the env-config module itself, a `*.test.*` / `*.spec.*` file, `next.config.*` / `vite.config.*` / `astro.config.*` / similar build-time tooling, or the variable is exactly `NODE_ENV`.
+   - **Candidate** otherwise.
+4. Report each candidate with its file:line and the variable name.
+
+Output:
+
+```
+[env-config] No inline process.env accesses detected outside the config module.
+
+or
+
+[env-config] INFORMATIONAL — 3 inline accesses detected
+
+  process.env.AUTH_SECRET
+    src/app/api/admin/route.ts:14
+  → Suggestion: read this in src/env.ts and import `env.AUTH_SECRET` here
+
+  process.env.STRIPE_KEY
+    src/services/payment.ts:9
+    src/services/refund.ts:22
+  → Suggestion: extract to env.ts schema with .min() / .startsWith("sk_") constraint
+```
+
+If no config module candidate exists in the repo, prefix the report with:
+
+```
+[env-config] No env-config module detected. Consider creating src/env.ts following rules/code-quality/env-config.md before refactoring inline reads.
+```
+
+This gate is **informational only** — it does not block `quality-review`. Some matches may be legitimate exceptions (build scripts, library glue). The developer reviews and decides.
+
 ## Output format
 
 ```
-[quality-review] PASS — Gates 1–6 passed (Gate 7 informational)
+[quality-review] PASS — Gates 1–6 passed (Gates 7 and 8 informational)
 
 or
 
@@ -106,6 +146,10 @@ or
 
   Gate 7 — Magic strings (informational, does not block)
   [magic-strings] 'open' — 4 occurrences → extract as PollStatus.Open
+
+  Gate 8 — Inline process.env (informational, does not block)
+  [env-config] process.env.AUTH_SECRET at src/app/api/admin/route.ts:14
+              → move to src/env.ts and import `env.AUTH_SECRET`
 ```
 
 CRITICAL security issues and architecture violations block proceeding. MEDIUM and LOW issues are presented to the developer who decides whether to fix before moving on. Gate 7 findings never block — they are presented as suggestions only.

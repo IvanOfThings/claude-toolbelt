@@ -23,6 +23,7 @@ Reviewed against the **OWASP Top 10 (2021)** plus CSRF and XSS as standalone cat
 - [ ] Cookies storing session / auth tokens set `Secure`, `HttpOnly`, and `SameSite` (Strict or Lax — not None unless cross-site is required and CSRF mitigated separately)
 - [ ] No deprecated ciphers, weak random number generators, or hardcoded IVs
 - [ ] Secrets and tokens are read from environment variables, never hardcoded or committed
+- [ ] Secrets are loaded from a **validated config module at boot** (see `rules/code-quality/env-config.md`), never via inline `process.env.X` lookups inside handlers or services — fail-fast at startup, not on first user request
 
 ## A03 — Injection
 
