@@ -26,18 +26,61 @@ Wait for the developer's selection before continuing.
 
 **3. Propose 3 candidate palettes (pre-validated)**
 
-Based on the product context from `docs/plan.md`, generate candidate palettes. Each candidate is a **full `token_table`** matching the shape consumed by `check-contrast` Mode 2 and `check-affordance` — see `rules/templates/ui-design-tokens.md` for the complete list of categories (surfaces, text, brand, buttons, links, borders, focus). Do not skip categories: a palette without `button-primary-bg` cannot be validated for affordance.
+**3a. Ask for brand colour hints (optional)**
 
-**Pre-validate each candidate** by invoking, in order:
+Before generating, ask the developer:
 
-1. `check-contrast` in **Mode 2** with the candidate's `token_table`. The skill expands the canonical matrix and returns the full audit. The matrix definition lives in `check-contrast` — do not duplicate it here.
-2. `check-affordance` with the same `token_table`, **omitting `rules_md_path`** (the file does not exist yet — only token-level checks 1–7 run).
+> *"Do you have any brand colours you want me to honour in the palettes? You can paste hex codes, name a colour family (e.g. 'forest olive', 'terracotta', 'navy'), or describe the brand vibe in words. Leave blank to generate from product context only."*
 
-A candidate is presentable only if **both** skills return `PASS`. Discard failing candidates and regenerate until you have 3 valid options.
+Parse the answer into a `brand_hints` structure:
+- `hex_anchors: string[]` — explicit hex values the developer wants pinned
+- `colour_family: string` — named family ("olive", "saffron", etc.) the brand belongs to
+- `vibe: string` — free-form description ("warm Mediterranean restaurant", "calm modern cookbook")
+- Or `null` if the developer left it blank
 
-Show the developer the resulting palettes with their full `check-contrast` tables and `check-affordance` results, then ask them to choose or describe custom colors.
+Brand hints are **inputs to the heuristic generator**, not hard constraints — if a provided hex cannot pass contrast in any plausible arrangement, surface the problem and ask the developer whether to relax it.
 
-If the developer describes custom colors, build the full `token_table` from their input and run both skills again before accepting. On any failure, surface it with the suggested replacement and re-ask — do not silently proceed.
+**3b. Generate three distinct candidates (heuristic stage)**
+
+Apply `rules/ui/palette-design-heuristics.md` (H1–H8) when generating each candidate `token_table`. Key heuristics:
+
+- **H1 One dominant brand colour per palette** — `primary` is the brand; `accent` is a quieter partner; status colours live on a separate functional axis.
+- **H2 Temperature-coherent focus ring** — warm palette → warm `focus-ring` (amber/saffron/ochre); cool palette → cool ring (cyan/lavender/sky). Generic teal on a warm palette is forbidden.
+- **H3 Lightest passing border** — `border-card`, `border-input`, `divider` use the lightest tone that still passes 3:1, not "any passing tone".
+- **H4 Adjust the gradient, not the text** — if the hero gradient cannot give `hero-text` 4.5:1 at the lightest stop, darken the gradient ramp until it does.
+- **H5 Solid `hero-text`** — never `opacity` or `rgba()` alpha for hero overlays.
+- **H6 Status colours on a separate axis** — `success`/`warning`/`danger` are functional (green/amber/red typically), not derived from `primary`/`accent`.
+- **H7 Three distinct directions** — the three candidates must represent meaningfully different design directions (different tone, temperature, or brand-colour family), not three saturations of the same hue.
+- **H8 Vibe-named palettes** — each candidate carries a short evocative name (2–4 words: "Sage Olive", "Terracotta", "Saffron Gold") so the developer reacts emotionally before reading hex codes.
+
+Each candidate is a **full `token_table`** matching the shape consumed by `check-contrast` Mode 2 and `check-affordance` — see `rules/templates/ui-design-tokens.md` for the complete list of categories (surfaces, text including `hero-text`, brand, status colours, buttons including ghost and danger, links, borders including `border-input-focus`, focus). Do not skip categories: a palette without `button-primary-bg` cannot be validated for affordance; a palette without `hero-text` cannot be validated against the gradient stops.
+
+**3c. Validate each candidate**
+
+For each candidate, invoke in order:
+
+1. `check-contrast` in **Mode 2** with the candidate's `token_table`. The skill expands the canonical matrix (including the gradient pairs `hero-text` × `bg-hero-from`/`bg-hero-to`) and returns the full audit.
+2. `check-affordance` with the same `token_table`, **omitting `rules_md_path`** (the file does not exist yet — token-level checks 1–7 and 11 run).
+
+A candidate is presentable only if **both** skills return `PASS`. If a candidate fails:
+- **Hero gradient pair fails at the lightest stop** → apply H4: darken `bg-hero-from` until the ratio passes. Do not change `hero-text`.
+- **Border fails 3:1** → walk the border tone one step darker; keep it as light as possible (H3).
+- **Button variant fails check #11 default-state distinction** → add a fill, border, or distinct text colour for that variant; never resolve by adding a hover-only style.
+
+Discard candidates that cannot be repaired and regenerate to keep three valid options.
+
+**3d. Present and select**
+
+Show the developer the three palettes with:
+- Vibe name (H8)
+- Dominant brand colour described in words
+- Hex preview of `primary`, `accent`, `focus-ring`, `hero-text`
+- Full `check-contrast` table per palette
+- `check-affordance` audit (10 token-level checks)
+
+Ask the developer to choose one or describe custom colours.
+
+If the developer describes custom colours, build the full `token_table` from their input, apply the heuristics, run both skills again before accepting. On any failure, surface it with the suggested adjustment and re-ask — do not silently proceed.
 
 Wait for the developer's selection before continuing.
 

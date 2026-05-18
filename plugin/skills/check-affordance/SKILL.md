@@ -39,6 +39,7 @@ rules_md_path:           # optional — path to .claude/rules/ui.md
 | 5 | If `link-text` defined: hex ≠ `text-strong.light` (and dark variant ≠ `text-strong.dark`)       | A link indistinguishable from body text fails WCAG 1.4.1.          |
 | 6 | `focus-ring` is defined                                                                        | Keyboard accessibility requires a visible focus indicator.         |
 | 7 | `border-card` and `border-input` are defined                                                   | Containers and inputs need explicit boundaries — borrowing `text-faint` is not acceptable. |
+| 11| **Default-state distinction** for every declared button variant (primary, outline, ghost, danger, custom). For each variant `V` that has any `button-V-*` token declared, at least one of the following must hold (in light **and** in dark mode separately):<br/>• `button-V-bg` is declared and its hex ≠ `bg-page` and ≠ `bg-panel`, **or**<br/>• `button-V-border` is declared (any non-transparent value), **or**<br/>• `button-V-text` is declared and its hex ≠ `text-strong` on the surface the button lives on. | A button that has none of these in its default state is invisible until `:hover` — fails the affordance rule. Hover-only buttons are not buttons. Ghost variants in particular often regress to `background: transparent + color: text-strong + border: none`; check #11 catches this. |
 
 ### Declaration-level checks (only when `rules_md_path` provided)
 
@@ -58,9 +59,9 @@ If `rules_md_path` is not provided, checks 8–10 are returned as a **TODO check
 
 Require `token_table` with at least `bg-page`, `bg-panel`, `text-strong`. Reject otherwise.
 
-**2. Run token-level checks 1–7**
+**2. Run token-level checks 1–7 and 11**
 
-For each failing check, record: check number, what failed, and the specific tokens involved.
+For each failing check, record: check number, what failed, and the specific tokens involved. Check 11 runs per declared button variant (primary, outline, ghost, danger, plus any custom `button-*-*` family detected in the `token_table`) and emits one row per variant per mode.
 
 **3. Run declaration-level checks 8–10** (if `rules_md_path` given)
 

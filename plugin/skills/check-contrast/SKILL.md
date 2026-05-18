@@ -88,17 +88,35 @@ When `token_table` is provided, the skill generates pairs as follows. Each row p
 | Brand text on page                | `primary`           | `bg-page`              | normal |
 | Button text on primary fill       | `button-primary-text` | `button-primary-bg`  | normal |
 | Outline button text on page       | `button-outline-text` | `bg-page`            | normal |
+| Ghost button text on ghost fill   | `button-ghost-text` | `button-ghost-bg`      | normal |
+| Danger button text on danger fill | `button-danger-text` | `button-danger-bg`    | normal |
+| Hero text on lightest gradient stop | `hero-text`       | `bg-hero-from`         | normal |
+| Hero text on darkest gradient stop  | `hero-text`       | `bg-hero-to`           | normal |
 | Primary button vs page            | `button-primary-bg` | `bg-page`              | ui     |
 | Primary button vs panel           | `button-primary-bg` | `bg-panel`             | ui     |
+| Ghost button vs page              | `button-ghost-bg`   | `bg-page`              | ui     |
+| Danger button vs page             | `button-danger-bg`  | `bg-page`              | ui     |
+| Danger button vs panel            | `button-danger-bg`  | `bg-panel`             | ui     |
 | Outline button border vs page     | `button-outline-border` | `bg-page`          | ui     |
 | Card border vs page               | `border-card`       | `bg-page`              | ui     |
 | Input border vs panel             | `border-input`      | `bg-panel`             | ui     |
+| Input focus border vs panel       | `border-input-focus`| `bg-panel`             | ui     |
 | Divider vs page                   | `divider`           | `bg-page`              | ui     |
 | Focus ring vs page                | `focus-ring`        | `bg-page`              | ui     |
 | Focus ring vs panel               | `focus-ring`        | `bg-panel`             | ui     |
 | Focus ring vs primary button      | `focus-ring`        | `button-primary-bg`    | ui     |
 
 This is the **canonical definition** of "complete design-system contrast audit". Adding a new token category (e.g. `button-disabled-bg`) means extending this table once — every caller using Mode 2 picks it up automatically.
+
+### Gradient text rule
+
+When text is placed on a linear gradient (hero sections, banners, callouts), `check-contrast` generates **two pairs per text-on-gradient combination** — one against the **lightest stop** and one against the **darkest stop** of the gradient. Both must pass.
+
+- For dark text on a light-to-dark gradient, the **lightest stop is the worst case** (lowest ratio).
+- For light text on the same gradient, the **darkest stop is the worst case**.
+- Never validate against the gradient's "average" colour — that hides the failing region.
+
+In the canonical matrix above this is encoded by the `hero-text on bg-hero-from` + `hero-text on bg-hero-to` pair. Projects with additional gradient surfaces (e.g. CTA banner, secondary hero) should extend the matrix the same way: declare both stops as tokens and validate the overlay text against each.
 
 ## Steps
 
