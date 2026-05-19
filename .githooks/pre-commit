@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+#
+# Pre-commit hook — runs the plugin coherence checker against the working tree
+# whenever the staged changeset touches plugin/** or .claude-plugin/**.
+#
+# Activate this hook on a fresh clone with:
+#
+#   git config core.hooksPath .githooks
+#
+# To bypass intentionally (rare — record the reason in the commit body):
+#
+#   git commit --no-verify
+#
+set -e
+
+# Only run if the staged diff touches plugin files or the marketplace manifest.
+if ! git diff --cached --name-only | grep -qE '^plugin/|^\.claude-plugin/'; then
+  exit 0
+fi
+
+ROOT="$(git rev-parse --show-toplevel)"
+SCRIPT="$ROOT/scripts/check-plugin-coherence.py"
+
+if [ ! -f "$SCRIPT" ]; then
+  echo "[pre-commit] coherence script missing at $SCRIPT — skipping"
+  exit 0
+fi
+
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "[pre-commit] python3 not on PATH — skipping coherence check"
+  echo "             install Python 3 or set core.hooksPath to an empty dir to bypass"
+  exit 0
+fi
+
+echo "[pre-commit] plugin/** or .claude-plugin/** changes detected — running coherence check"
+python3 "$SCRIPT"
