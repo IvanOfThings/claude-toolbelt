@@ -350,6 +350,30 @@ Commits prefixed with `docs:`, `refactor:`, or `chore:` appear in the changelog 
 
 ---
 
+## Plugin development — coherence checker
+
+Whenever the staged changeset touches `plugin/**` or `.claude-plugin/**`, a pre-commit hook runs `scripts/check-plugin-coherence.py` and aborts the commit on inconsistencies. The script verifies:
+
+- Backticked `rules/...md` references resolve to a real file
+- Every `Invoke \`<name>\`` in a command points to an existing skill
+- `plugin/package.json` `name` is declared in `.claude-plugin/marketplace.json` and the declared source paths resolve
+- Tokens referenced in `check-contrast`'s canonical matrix are declared in `rules/templates/ui-design-tokens.md`
+- Orphan skills and rules (no references found anywhere in the plugin) are surfaced as warnings
+
+### Activate the hook (once per clone)
+
+```bash
+git config core.hooksPath .githooks
+```
+
+After that, every `git commit` that includes plugin files runs the check automatically. Bypass intentionally with `git commit --no-verify` only when the reason is recorded in the commit body.
+
+### Deeper checks — `/plugin-coherence`
+
+The pre-commit hook runs only the mechanical layer (fast, deterministic). For semantic checks — doctrine ↔ executor alignment, narrative consistency between `README.md`, `plugin/README.md`, and `CLAUDE.md` — invoke `/plugin-coherence` interactively in Claude Code. Recommended after adding a new rule, skill, command, or non-trivial executor change, and before merging a plugin-evolution PR.
+
+---
+
 ## Shell configuration
 
 `shell/zshrc` — Zsh config with quality-of-life tooling. Symlink to `~/.zshrc`.

@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.0](https://github.com/IvanOfThings/claude-toolbelt/compare/v1.3.0...v1.4.0) (2026-05-19)
+
+
+### Features
+
+* add plugin coherence checker with pre-commit hook integration ([3a7df84](https://github.com/IvanOfThings/claude-toolbelt/commit/3a7df841d14989477bdcbb72e21d194deb228619))
+* add plugin coherence checker with pre-commit hook integration ([87ff0e8](https://github.com/IvanOfThings/claude-toolbelt/commit/87ff0e80568e341c6847c09d0f0674e7bbb546be))
+
 ## [1.3.0](https://github.com/IvanOfThings/claude-toolbelt/compare/v1.2.0...v1.3.0) (2026-05-18)
 
 
