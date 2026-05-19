@@ -10,6 +10,7 @@ Run this checklist on every code change before merging. Used by the `quality-rev
 - [ ] Business logic in services, not in routes or components
 - [ ] No magic strings for domain enums — states, roles, types/kinds, error codes come from a single enum / `const as const` / generated schema type, never duplicated as string literals across files (see `rules/code-quality/code-quality.md`)
 - [ ] Services with multi-step transactions follow the coordinator + atomic-action pattern (see `rules/code-quality/transaction-coordinator.md`) — no super-function combining validations, transaction wrapper, and all writes in one body
+- [ ] No `process.env.X` accessed inline in business logic — env vars are read and validated once at startup in a single typed config module (`env.ts` / `config.ts`); only `NODE_ENV`, build-time tooling, and tests are allowed exceptions (see `rules/code-quality/env-config.md`)
 
 ## React / Next.js (skip if not applicable)
 
